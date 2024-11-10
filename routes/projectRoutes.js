@@ -1,11 +1,19 @@
-// src/routes/projectRoutes.js
 const express = require('express');
-const { createProject } = require('../controllers/projectController');
+const { createProject, listProjects, updateProject, deleteProject } = require('../controllers/projectController');
 const auth = require('../middleware/authMiddleware');
 
 const router = express.Router();
+
+// Route to create a new project
 router.post('/', auth, createProject);
 
-// Add routes for listProjects, updateProject, deleteProject
+// Route to list all projects
+router.get('/', auth, listProjects);
+
+// Route to update a specific project by ID
+router.put('/:projectId', auth, updateProject);
+
+// Route to delete a specific project by ID
+router.delete('/:projectId', auth, deleteProject);
 
 module.exports = router;
