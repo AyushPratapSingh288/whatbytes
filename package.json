@@ -4,19 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-<<<<<<< HEAD
     "start": "node server.js",
     "dev": "nodemon server.js",
     "postinstall": "npx prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
-=======
   "start": "node server.js",
   "dev": "nodemon server.js",
   "postinstall": "npx prisma generate"
 },
->>>>>>> f6c62907f96120e6af5da333e311826137c7fe35
   "keywords": [],
   "author": "",
   "license": "ISC",
