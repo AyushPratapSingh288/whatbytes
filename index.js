@@ -8,6 +8,7 @@ const authMiddleware = require('./middleware/authMiddleware');
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
 app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/projects', projectRoutes);
