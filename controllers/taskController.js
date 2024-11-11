@@ -16,11 +16,17 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// List all tasks within a specific project
-exports.listTasks = async (req, res) => {
+// Here list all tasks with optional filtering by status and assigned user
+exports.listFilteredTasks = async (req, res) => {
+  const { status, assignedUserId } = req.query; 
+  const filters = {};
+
+  if (status) filters.status = status;
+  if (assignedUserId) filters.assignedUserId = assignedUserId;
+
   try {
     const tasks = await prisma.task.findMany({
-      where: { projectId: parseInt(req.params.projectId, 10) },
+      where: filters,
     });
     res.status(200).json(tasks);
   } catch (error) {
@@ -28,35 +34,20 @@ exports.listTasks = async (req, res) => {
   }
 };
 
-// Update a specific task by ID within a project
-exports.updateTask = async (req, res) => {
-  const { projectId, taskId } = req.params;
-  try {
-    const updatedTask = await prisma.task.update({
-      where: { 
-        id: parseInt(taskId, 10),
-        projectId: parseInt(projectId, 10),
-      },
-      data: req.body,
-    });
-    res.status(200).json(updatedTask);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update task' });
-  }
-};
+// Here tasks for a specific project with optional status filter
+exports.listProjectTasks = async (req, res) => {
+  const { projectId } = req.params;
+  const { status } = req.query; 
 
-// Delete a specific task by ID within a project
-exports.deleteTask = async (req, res) => {
-  const { projectId, taskId } = req.params;
   try {
-    await prisma.task.delete({
-      where: { 
-        id: parseInt(taskId, 10),
+    const tasks = await prisma.task.findMany({
+      where: {
         projectId: parseInt(projectId, 10),
+        ...(status && { status }), 
       },
     });
-    res.status(200).json({ message: 'Task deleted successfully' });
+    res.status(200).json(tasks);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete task' });
+    res.status(500).json({ error: 'Failed to retrieve project tasks' });
   }
 };

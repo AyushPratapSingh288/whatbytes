@@ -6,7 +6,7 @@ exports.createProject = async (req, res) => {
     const project = await prisma.project.create({
       data: {
         ...req.body,
-        userId: req.user.id, // Assumes user ID is available in request (JWT auth)
+        userId: req.user.id, 
       },
     });
     res.status(201).json(project);
@@ -30,14 +30,26 @@ exports.listProjects = async (req, res) => {
 // Update a specific project by ID
 exports.updateProject = async (req, res) => {
   const { projectId } = req.params;
+  const userId = req.user.id; 
+
   try {
+    const project = await prisma.project.findUnique({
+      where: { id: parseInt(projectId, 10) },
+    });
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    if (project.userId !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to update this project' });
+    }
+
     const updatedProject = await prisma.project.update({
-      where: { 
-        id: parseInt(projectId, 10),
-        userId: req.user.id,
-      },
+      where: { id: parseInt(projectId, 10) },
       data: req.body,
     });
+
     res.status(200).json(updatedProject);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update project' });
@@ -47,13 +59,27 @@ exports.updateProject = async (req, res) => {
 // Delete a specific project by ID
 exports.deleteProject = async (req, res) => {
   const { projectId } = req.params;
+  const userId = req.user.id; 
+
   try {
-    await prisma.project.delete({
-      where: { 
-        id: parseInt(projectId, 10),
-        userId: req.user.id,
-      },
+    const project = await prisma.project.findUnique({
+      where: { id: parseInt(projectId, 10) },
     });
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+   
+    if (project.userId !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to delete this project' });
+    }
+
+
+    await prisma.project.delete({
+      where: { id: parseInt(projectId, 10) },
+    });
+
     res.status(200).json({ message: 'Project deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete project' });
